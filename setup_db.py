@@ -38,8 +38,8 @@ def check_setup_data(debug):
             },
         ]
         connection.execute(ins, items)
-        if debug >= 1:
+        if debug >= 1:  # 1
             print('Initialized setup data')
     else:
-        if debug >= 1:
+        if debug >= 1:  # 1
             print('Setup Data not required')

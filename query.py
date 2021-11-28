@@ -30,14 +30,14 @@ def populate_data(current_date):
 
 
 def populate_instruments_data():
-    if debug >= 1:
+    if debug >= 1:  # 1
         print(f'*** Executing populate_instruments_data ... ***')
     stmt = select([instruments.c.symbol, instruments.c.name, instruments.c.ins_type, instruments.c.ins_details_url])
     query_result = connection.execute(stmt).fetchall()
 
-    if debug >= 5:
+    if debug >= 4:  # 4
         print(str(stmt))
-    if debug >= 4:
+    if debug >= 4:  # 4
         print(query_result)
 
     # if price result is empty, insert records into the two tables
@@ -51,28 +51,28 @@ def populate_instruments_data():
             # print('********')
             # print(sub_q)
 
-            if debug >= 4:
+            if debug >= 2:  # 2
                 print(f"{x['symbol']} exists already ....")
 
             if page_upd:
-                if debug >= 4:
+                if debug >= 2:  # 2
                     print(f"Updating instruments table for {x['symbol']} ....")
                 try:
                     u = update(instruments).where(instruments.c.symbol == x['symbol'])
                     u = u.values(ins_details_url=(x['link']), modified_by=demo_user)
-                    if debug >= 4:
+                    if debug >= 4:  # 4
                         print(str(u))
                     connection.execute(u)
                 except AttributeError as error:
                     print(error)
 
         else:
-            if debug >= 4:
+            if debug >= 2:  # 2
                 print(f"{x['symbol']} does not exist. Generating inserting statement ...")
             generate_int_data(symbol_data, x['symbol'], x['link'], demo_user)
 
     # insert symbols with blank data into Equity Info
-    if debug >= 5:
+    if debug >= 3:  # 3
         print('Printing query to insert into instruments table: symbol_data ...')
         pprint(symbol_data)
     try:
@@ -84,33 +84,33 @@ def populate_instruments_data():
 
 
 def populate_daily_price_data(current_date):
-    if debug >= 1:
+    if debug >= 1:  # 1
         print(f'*** Executing populate_daily_price_data ... ***')
     stmt = select([daily_price.c.symbol, daily_price.c.value_date, daily_price.c.amount])
     stmt = stmt.where(daily_price.c.value_date == current_date)
     query_result = connection.execute(stmt).fetchall()
 
-    if debug >= 5:
+    if debug >= 4:  # 4
         print(str(stmt))
-    if debug >= 4:
+    if debug >= 4:  # 4
         print(query_result)
 
     daily_price_data = []
     for x in share_price_data.price_data:
         # check if price_data.symbol exists in query_result
         if list(filter(lambda query: query['symbol'] == x['symbol'], query_result)):
-            if debug >= 5:
+            if debug >= 2:  # 2
                 print(f"{x['symbol']} exists already for the day, updating ....")
             u = update(daily_price).where(
                 and_(daily_price.c.symbol == x['symbol'],
                      daily_price.c.value_date == current_date)
             )
             u = u.values(amount=(x['price']), modified_by=demo_user)
-            if debug >= 4:
+            if debug >= 4:  # 4
                 print(str(u))
             connection.execute(u)
         else:
-            if debug >= 5:
+            if debug >= 2:  # 2
                 print(f"{x['symbol']} does not exist for the day.Inserting ....")
             gen_daily_price_data(daily_price_data, current_date, x['symbol'], x['price'], demo_user)
 
@@ -145,7 +145,7 @@ def populate_equity_info_data():
                     print(str(u))
                 connection.execute(u)
             else:
-                if debug >= 0:  # 5
+                if debug >= 2:  # 2
                     print(f"{record['symbol']} has never been updated, now updating ....")
                 try:
                     u = update(instruments).where(instruments.c.symbol == record['symbol'])
@@ -249,7 +249,7 @@ def populate_bond_info_data():
                     print(str(u))
                 connection.execute(u)
             else:
-                if debug >= 0:  # 5
+                if debug >= 2:  # 2
                     print(f"{record['symbol']} has never been updated, now updating ....")
                 try:
                     u = update(instruments).where(instruments.c.symbol == record['symbol'])

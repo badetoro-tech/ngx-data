@@ -12,7 +12,7 @@ def extract_equity_info(page_url):
     response = requests.get(page_url, headers=HEADER)
     page_extract = response.text
     soup = BeautifulSoup(page_extract, "html.parser")
-    if debug >= 5:  # 5
+    if debug >= 4:  # 4
         print('*** Spooling BeautifulSoup Extract ... *** ')
         print(soup.prettify())
 
@@ -53,14 +53,14 @@ def extract_bond_info(page_url):
     response = requests.get(page_url, headers=HEADER)
     page_extract = response.text
     soup = BeautifulSoup(page_extract, "html.parser")
-    if debug >= 5:  # 5
+    if debug >= 4:  # 4
         print('*** Spooling BeautifulSoup Extract ... *** ')
         print(soup.prettify())
 
     profile_data = soup.find(name="table", class_="wpDataTable")
     bond_info = profile_data.find_all(name="td")
 
-    if debug >= 5:  # 5
+    if debug >= 4:  # 4
         pprint(bond_info)
 
     cnt = 0
@@ -79,7 +79,7 @@ def extract_bond_info(page_url):
     dynamic_string += '}'
 
     data_record = ast.literal_eval(dynamic_string)
-    if debug >= 5:  # 5
+    if debug >= 4:  # 4
         pprint(data_record)
 
     return data_record
@@ -117,7 +117,7 @@ class SharePriceData:
         if len(self.symbols) == len(price_list_details) == len(price_list_data) == len(self.links) == len(self.prices):
             self.data_validated = True
             self.generate_price_json()
-            if debug >= 5:
+            if debug >= 4:  # 4
                 pprint(self.price_data)
 
     def generate_price_json(self):
@@ -125,7 +125,7 @@ class SharePriceData:
         duplicated_url_check = ''
         duplicated_symbol = ''
         for x in range(len(self.symbols)):
-            if debug >= 5:
+            if debug >= 3:  # 3
                 print('*** Checking duplicated symbol and url ***')
                 print(f'{duplicated_symbol}|{duplicated_url_check}')
             if duplicated_symbol == str(self.symbols[x]) and len(duplicated_url_check) >= len(str(self.links[x])):

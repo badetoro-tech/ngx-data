@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from models import metadata
 from database import engine
 from config import debug, demo_user, page_upd
+
 # from sqlalchemy import select, MetaData, Table, and_, update, insert
 # from pprint import pprint
 
@@ -18,11 +19,17 @@ demo_user = demo_user
 page_upd = page_upd
 debug = debug
 
+start_time = datetime.now()
+if debug >= 0:
+    print(f'*** Starting program at {start_time.strftime("%d-%b-%Y %I:%M:%S.%f %p")} ***')
+
 # check if today is weekend and set to prev working day
 current_date = today
 if today.isoweekday() > 5:
     current_date = today - timedelta(days=(today.isoweekday() - 5))
-print(f'*** Running as current date: {str(current_date)} ***')
+
+if debug >= 0:
+    print(f'*** Running as current date: {str(current_date)} ***')
 
 if today.isoweekday() == 7 and today.day <= 7:
     page_upd = True
@@ -36,3 +43,8 @@ check_setup_data(debug)
 
 # Populating tables with extracted data
 x = query.populate_data(current_date)
+
+finish_time = datetime.now()
+if debug >= 0:
+    print(f'*** Finished program at {finish_time.strftime("%d-%b-%Y %I:%M:%S.%f %p")} ***')
+    print(f'*** Time to complete - {finish_time - start_time} ***')
