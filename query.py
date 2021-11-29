@@ -22,11 +22,11 @@ def populate_data(current_date):
     if page_upd:
         print(f'*** To update all pages details on first Sunday of the month ***')
 
-    # populate_instruments_data()
-    # populate_daily_price_data(current_date)
-    #
-    # populate_equity_info_data()
-    # populate_bond_info_data()
+    populate_instruments_data()
+    populate_daily_price_data(current_date)
+
+    populate_equity_info_data()
+    populate_bond_info_data()
     populate_fund_info_data()
 
 
