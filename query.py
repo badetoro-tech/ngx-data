@@ -22,11 +22,12 @@ def populate_data(current_date):
     if page_upd:
         print(f'*** To update all pages details on first Sunday of the month ***')
 
-    populate_instruments_data()
-    populate_daily_price_data(current_date)
-
-    populate_equity_info_data()
-    populate_bond_info_data()
+    # populate_instruments_data()
+    # populate_daily_price_data(current_date)
+    #
+    # populate_equity_info_data()
+    # populate_bond_info_data()
+    populate_fund_info_data()
 
 
 def populate_instruments_data():
@@ -317,6 +318,103 @@ def populate_bond_info_data():
                                      coupon=float(extracted_data['Coupon'].replace('--', '0')),
                                      issue_price=float(extracted_data['Issue Price (₦)'].replace('--', '0')),
                                      bond_type=extracted_data['Bond Type'],
+                                     created_by=demo_user)
+                        if debug >= 4:  # 4
+                            print(str(u))
+                            pprint(extracted_data)
+                        connection.execute(u)
+                    except AttributeError as error:
+                        print(error)
+
+        if to_wait:
+            time.sleep(wait_time)
+
+
+def populate_fund_info_data():
+    if debug >= 1:  # 1
+        print(f'*** Executing populate_fund_info_data ... ***')
+    stmt = select([instruments.c.symbol, instruments.c.name, instruments.c.ins_details_url])
+    stmt = stmt.where(instruments.c.ins_type == 3)
+    query_result = connection.execute(stmt).fetchall()
+
+    for record in query_result:
+        to_wait = False
+        page_url = record['ins_details_url']
+        if record['symbol'] == record['name']:
+            to_wait = True
+            try:
+                extracted_data = extract_bond_info(page_url)
+            except AttributeError as error:
+                print(error)
+                u = update(instruments).where(instruments.c.symbol == record['symbol'])
+                u = u.values(name='', modified_by=demo_user)
+                if debug >= 4:  # 4
+                    print(str(u))
+                connection.execute(u)
+            else:
+                if debug >= 2:  # 2
+                    print(f"{record['symbol']} has never been updated, now updating ....")
+                try:
+                    u = update(instruments).where(instruments.c.symbol == record['symbol'])
+                    u = u.values(name=(str(extracted_data['ETP Description'])), modified_by=demo_user)
+                    if debug >= 4:  # 4
+                        print(str(u))
+                        pprint(extracted_data)
+                    connection.execute(u)
+                except AttributeError as error:
+                    print(error)
+
+                try:
+                    # insert bond details into exc_fund_info table
+                    ins = insert(exc_fund_info)
+                    fund_data = {
+                        'symbol': record['symbol'],
+                        'description': extracted_data['ETP Description'],
+                        'fund_manager': extracted_data['FUND MANAGER'],
+                        'issue_no': extracted_data['ISIN'],
+                        'index_tracked': extracted_data['INDEX TRACKED'],
+                        'fund_sponsor': extracted_data['FUND SPONSOR'],
+                        'trustee': extracted_data['TRUSTEE'],
+                        'custodian': extracted_data['CUSTODIAN'],
+                        'liquidity_provider': extracted_data['LIQUIDITY PROVIDER'],
+                        'created_by': demo_user
+                    }
+                    if len(fund_data) > 0:
+                        connection.execute(ins, fund_data)
+                except IntegrityError as error:
+                    print(error)
+
+        elif record['symbol'] != record['name'] and page_upd:
+            to_wait = True
+            try:
+                extracted_data = extract_bond_info(page_url)
+            except AttributeError as error:
+                print(error)
+            else:
+                if exc_fund_info.c.symbol == record['symbol'] and exc_fund_info.c.issue_no != extracted_data['ISIN']:
+                    if debug >= 2:  # 2
+                        print(f"{record['symbol']} now updating ....")
+
+                    try:
+                        u = update(instruments).where(instruments.c.symbol == record['symbol'])
+                        u = u.values(name=(str(extracted_data['ETP Description'])),
+                                     modified_by=demo_user)
+                        if debug >= 4:  # 4
+                            print(str(u))
+                            pprint(extracted_data)
+                        connection.execute(u)
+                    except AttributeError as error:
+                        print(error)
+                    try:
+                        u = update(exc_fund_info).where(exc_fund_info.c.symbol == record['symbol'])
+                        u = u.values(description=extracted_data['ETP Description'],
+                                     fund_manager=extracted_data['FUND MANAGER'],
+                                     issue_no=extracted_data['ISIN'],
+                                     index_tracked=extracted_data['INDEX TRACKED'],
+                                     fund_sponsor=extracted_data['FUND SPONSOR'],
+                                     trustee=extracted_data['TRUSTEE'],
+                                     custodian=extracted_data['CUSTODIAN'],
+                                     liquidity_provider=extracted_data['LIQUIDITY PROVIDER'],
                                      created_by=demo_user)
                         if debug >= 4:  # 4
                             print(str(u))
