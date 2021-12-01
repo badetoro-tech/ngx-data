@@ -88,3 +88,23 @@ exc_fund_info = Table('exc_fund_info', metadata,
                       Column('last_modified', DateTime(), onupdate=datetime.now),
                       Column('modified_by', String(250))
                       )
+
+investor = Table('investor', metadata,
+                 Column('investor', String(100), primary_key=True, index=True),
+                 Column('investor_name', String(250)),
+                 Column('created_date', DateTime(), default=datetime.now),
+                 Column('created_by', String(100)),
+                 Column('last_modified', DateTime(), onupdate=datetime.now),
+                 Column('modified_by', String(250))
+                 )
+
+investment = Table('investment', metadata,
+                   Column('investor', String(100), ForeignKey('investor.investor')),
+                   Column('symbol', String(20), ForeignKey('instruments.symbol')),
+                   Column('unit', Integer()),
+                   Column('created_date', DateTime(), default=datetime.now),
+                   Column('created_by', String(100)),
+                   Column('last_modified', DateTime(), onupdate=datetime.now),
+                   Column('modified_by', String(250)),
+                   Index('ix01_investment', 'investor', 'symbol')
+                   )

@@ -6,13 +6,6 @@ from models import metadata
 from database import engine
 from config import debug, demo_user, page_upd
 
-# from sqlalchemy import select, MetaData, Table, and_, update, insert
-# from pprint import pprint
-
-# db = SessionLocal()
-metadata.create_all(engine)
-connection = engine.connect()
-
 # initialise local variables
 today = datetime.today().date()
 demo_user = demo_user
@@ -22,6 +15,10 @@ debug = debug
 start_time = datetime.now()
 if debug >= 0:
     print(f'*** Starting program at {start_time.strftime("%d-%b-%Y %I:%M:%S.%f %p")} ***')
+
+# db = SessionLocal()
+metadata.create_all(engine)
+connection = engine.connect()
 
 # check if today is weekend and set to prev working day
 current_date = today
