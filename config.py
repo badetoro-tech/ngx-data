@@ -1,3 +1,5 @@
+from datetime import datetime
+
 ngx_url = "https://ngxgroup.com/"
 
 header = {
@@ -10,3 +12,7 @@ demo_user = 'demo'
 page_upd = False
 debug = 0
 wait_time = 5
+
+today = datetime.today().date()
+if today.isoweekday() == 7 and today.day <= 7:
+    page_upd = True

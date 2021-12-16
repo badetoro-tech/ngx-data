@@ -106,7 +106,7 @@ class SharePriceData:
 
         self.links = [link.get("href") for link in listings_links]
         # link = [link for link in listings_links]
-        self.symbols = [link.getText().strip() for link in listings_links]
+        self.symbols = [link.getText().strip().split(' [')[0] for link in listings_links]
         price_list_details = [price.getText().split(" N") for price in prices]
 
         price_list_details.pop(0)

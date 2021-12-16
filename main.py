@@ -28,9 +28,6 @@ if today.isoweekday() > 5:
 if debug >= 0:
     print(f'*** Running as current date: {str(current_date)} ***')
 
-if today.isoweekday() == 7 and today.day <= 7:
-    page_upd = True
-
 # initialize setup data
 check_setup_data(debug)
 
